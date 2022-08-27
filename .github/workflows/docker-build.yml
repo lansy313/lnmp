@@ -2,7 +2,7 @@ name: docker image build and push
 on: [push]
 jobs:
 	Docker-Build-Push:
-		runs-on:centos-latest
+		runs-on: centos-latest
 		steps:
 			-
 				name: checkout
