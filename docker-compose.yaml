@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  php:
+    container_name: "php7.4"
+    build:
+      context: "./php"
+      dockerfile: "Dockerfile"
+    ports:
+      - "9001:9000"
+    volumes:
+      - ./php/etc:/user/local/etc
+      - ./php/logs:/var/log/php
+      - ./www:/www
+    stdin_open: true
+    tty: true
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - "mysql"
+    networks:
+      app-net:
+        ipv4_address: 192.0.0.3
+    environment:
+      - TZ=Asia/Shanghai
+  
+  nginx:
+    container_name: "nginx"
+    image: nginx:stable
+    ports:
+      - "86:80"
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - "php"
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/logs:/var/log/nginx/
+      - ./www:/www
+    networks:
+      app-net:
+        ipv4_address: 192.0.0.2
+
+  mysql:
+    container_name: "mysql57"
+    image: mysql:5.7
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/conf:/etc/mysql/conf.d
+      - ./mysql/logs:/data/mysql/logs 
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=liao7uj8ik
+    networks:
+      app-net:
+        ipv4_address: 192.0.0.4
+
+  redis:
+    container_name: "redis"
+    image: redis:5
+    restart: always
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./redis/conf:/usr/local/etc/redis
+      - ./redis/data:/data
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      app-net:
+        ipv4_address: 192.0.0.5
+
+networks:
+  app-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "192.0.0.0/24"
