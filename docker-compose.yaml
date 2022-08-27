@@ -54,7 +54,7 @@ services:
     restart: always
     environment:
       - TZ=Asia/Shanghai
-      - MYSQL_ROOT_PASSWORD=liao7uj8ik
+      - MYSQL_ROOT_PASSWORD=123456
     networks:
       app-net:
         ipv4_address: 192.0.0.4
